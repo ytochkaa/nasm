@@ -2,12 +2,11 @@ global _start
 
 section .data
     userStartMsg:           db "Введите 3 числа для поиска максимума и вывода разницы с другими числами",10
-    lenUserStartMsg         equ $-usнуууerStartMsg
+    lenUserStartMsg         equ $-userStartMsg
     strNumberEntrenceMsg:   db "Введите число: "
     lenstrNumberEntrenceMsg equ $-strNumberEntrenceMsg
     differenceMsg:          db "Разницы: "
     lenDifferenceMsg        equ $-differenceMsg
-    
     errorMsg:               db "Ошибка: ", 0
     lenErrorMsg             equ $-errorMsg
     invalidNumberMsg:       db "неверный формат числа", 10, 0
@@ -16,7 +15,6 @@ section .data
     lenOverflowMsg          equ $-overflowMsg
     readErrorMsg:           db "ошибка чтения", 10, 0
     lenReadErrorMsg         equ $-readErrorMsg
-    
     strNumsSize             equ 256
     numsSize                equ 8
     space                   db " "
@@ -24,14 +22,12 @@ section .data
     buffer                  times 21 db 0
 
 section .bss
-    numA    resq numsSize ;8ba
+    numA    resq numsSize
     numB    resq numsSize
     numC    resq numsSize
-
-    strNumA resb strNumsSize ;буферы 256ba
+    strNumA resb strNumsSize
     strNumB resb strNumsSize
     strNumC resb strNumsSize
-
     maxNum  resq numsSize
 
 section .text
@@ -165,12 +161,14 @@ _start:
     mov rdi, 1
     syscall
 
-; --------------------------- ФУНКЦИИ ----------------------------------------
+
+; ===================== ФУНКЦИИ =====================
 FuncPrintNumber:
 ; Функция: FuncPrintNumber
 ; Назначение: Печать числа в десятичном формате
 ; Вход: RAX - число для печати
 ; Используемые регистры: RAX, RBX, RCX, RDX, RSI, RDI
+; Сохраняемые регистры: Все (push/pop)
 
     push rax
     push rbx
@@ -216,7 +214,6 @@ FuncStrLen:
     je .done
     inc rcx
     jmp .loop
-
 .done:
     mov rax, rcx
     ret
@@ -243,11 +240,10 @@ FuncPrintError:
 
 FuncReadString:
 ; Функция: FuncReadString
-; Назначение: Чтение строки из потока ввода
+; Назначение: Чтение строки из stdin
 ; Вход: RSI - буфер для строки, RDX - размер буфера
 ; Выход: CF = 1 если ошибка, CF = 0 если успех
 ; Используемые регистры: RAX, RDI
-
     mov rax, 0
     mov rdi, 0
     syscall
@@ -258,11 +254,11 @@ FuncReadString:
     jmp .success
     
 .error:
-    stc                    ; Установка флага переноса
+    stc                    ; Установка флага переноса (CF = 1)
     ret
     
 .success:
-    clc                    ; Сброс флага переноса
+    clc                    ; Сброс флага переноса (CF = 0)
     ret
 
 FuncStrToInt:
@@ -272,7 +268,6 @@ FuncStrToInt:
 ; Выход: RAX - преобразованное число, CF = 0 если успех
 ;         RAX = 1 если неверный формат, RAX = 2 если переполнение, CF = 1 если ошибка
 ; Используемые регистры: RAX, RBX, RCX, RDX, R8, R9
-
     xor rax, rax
     xor rcx, rcx
     mov r8, 1               ; Флаг знака: 1 - положительное, -1 - отрицательное
